@@ -1,0 +1,62 @@
+rs.initiate(
+    {
+        _id: "emr-config-replica-set",
+        configsvr: true,
+        members: [
+            {
+                _id: 0,
+                host: "172.31.64.197:6001"
+            },
+            {
+                _id: 1,
+                host: "172.31.64.197:6002"
+            },
+            {
+                _id: 2,
+                host: "172.31.64.197:6003"
+            }
+        ]
+    }
+)
+
+rs.initiate(
+    {
+        _id: "emr-first-shard-replica-set",
+        members: [
+            {_id: 0, host: "172.31.64.193:5101"},
+            {_id: 1, host: "172.31.64.193:5102"},
+            {_id: 2, host: "172.31.64.193:5103"}
+        ]
+    }
+)
+
+rs.initiate(
+    {
+        _id: "emr-second-shard-replica-set",
+        members: [
+            {_id: 0, host: "172.31.64.193:5201"},
+            {_id: 1, host: "172.31.64.193:5202"},
+            {_id: 2, host: "172.31.64.193:5203"}
+        ]
+    }
+)
+
+rs.initiate(
+    {
+        _id: "emr-third-shard-replica-set",
+        members: [
+            {_id: 0, host: "172.31.64.193:5301"},
+            {_id: 1, host: "172.31.64.193:5302"},
+            {_id: 2, host: "172.31.64.193:5303"}
+        ]
+    }
+)
+
+
+sh.addShard("emr-first-shard-replica-set/172.31.64.193:5101,172.31.64.193:5102,172.31.64.193:5103")
+sh.addShard("emr-second-shard-replica-set/172.31.64.193:5201,172.31.64.193:5202,172.31.64.193:5203")
+sh.addShard("emr-third-shard-replica-set/172.31.64.193:5301,172.31.64.193:5302,172.31.64.193:5303")
+
+
+sh.enableSharding("paripurna")
+sh.shardCollection("paripurna.rmk3_2_rev_5", {"no_pendaftaran": "hashed"})

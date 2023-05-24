@@ -1,0 +1,104 @@
+version: "3.5"
+
+services:
+  mongo-config-cluster2:
+    image: alfianlensundev/mongo-wkey:6.0.6-jammy
+    container_name: mongo-config-cluster2
+    command: mongod --keyFile /data/mongodb-keyfile --configsvr --replSet emr-config-rs --port 27019
+    ports:
+      - 6002:27019
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    volumes: 
+      - ./emr-config-c2:/data/db
+      - ./emr-configdb-c2:/data/configdb
+    networks:
+      - "net"
+
+  mongo-config-cluster3:
+    image: alfianlensundev/mongo-wkey:6.0.6-jammy
+    container_name: mongo-config-cluster3
+    command: mongod --keyFile /data/mongodb-keyfile --configsvr --replSet emr-config-rs --port 27019
+    ports:
+      - 6003:27019
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    volumes: 
+      - ./emr-config-c3:/data/db
+      - ./emr-configdb-c3:/data/configdb
+    networks:
+      - "net"
+
+  mongo-shard1-cluster2:
+    image: alfianlensundev/mongo-wkey:6.0.6-jammy
+    container_name: mongo-shard1-cluster2
+    command: mongod --keyFile /data/mongodb-keyfile --shardsvr --replSet emr-shard1-rs --port 27018
+    ports:
+      - 5102:27018
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    volumes: 
+      - ./emr-s1-c2:/data/db
+    networks:
+      - "net"
+
+  mongo-shard1-cluster3:
+    image: alfianlensundev/mongo-wkey:6.0.6-jammy
+    container_name: mongo-shard1-cluster3
+    command: mongod --keyFile /data/mongodb-keyfile --shardsvr --replSet emr-shard1-rs --port 27018
+    ports:
+      - 5103:27018
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    volumes: 
+      - ./emr-s1-c3:/data/db
+    networks:
+      - "net"
+
+
+  mongo-shard2-cluster2:
+    image: alfianlensundev/mongo-wkey:6.0.6-jammy
+    container_name: mongo-shard2-cluster2
+    command: mongod --keyFile /data/mongodb-keyfile --shardsvr --replSet emr-shard2-rs --port 27018
+    ports:
+      - 5202:27018
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    volumes: 
+      - ./emr-s2-c2:/data/db
+    networks:
+      - "net"
+
+  mongo-shard2-cluster3:
+    image: alfianlensundev/mongo-wkey:6.0.6-jammy
+    container_name: mongo-shard2-cluster3
+    command: mongod --keyFile /data/mongodb-keyfile --shardsvr --replSet emr-shard2-rs --port 27018
+    ports:
+      - 5203:27018
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    volumes: 
+      - ./emr-s2-c3:/data/db
+    networks:
+      - "net"
+networks:
+  net:
+    external: true

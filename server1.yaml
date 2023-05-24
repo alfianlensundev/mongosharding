@@ -1,0 +1,69 @@
+version: "3.5"
+
+services:
+  mongo-config-cluster1:
+    image: alfianlensundev/mongo-wkey:6.0.6-jammy
+    container_name: mongo-config-cluster1
+    command: mongod --keyFile /data/mongodb-keyfile --configsvr --replSet emr-config-rs --port 27019
+    ports:
+      - 6001:27019
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    volumes:
+      - ./emr-config-c1:/data/db
+      - ./emr-configdb-c1:/data/configdb
+    networks:
+      - "net"
+  mongo-shard1-cluster1:
+    image: alfianlensundev/mongo-wkey:6.0.6-jammy
+    container_name: mongo-shard1-cluster1
+    command: mongod --keyFile /data/mongodb-keyfile --shardsvr --replSet emr-shard1-rs --port 27018
+    ports:
+      - 5101:27018
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    volumes:
+      - ./emr-s1-c1:/data/db
+    networks:
+      - "net"
+  mongo-shard2-cluster1:
+    image: alfianlensundev/mongo-wkey:6.0.6-jammy
+    container_name: mongo-shard2-cluster1
+    command: mongod --keyFile /data/mongodb-keyfile --shardsvr --replSet emr-shard2-rs --port 27018
+    ports:
+      - 5201:27018
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    volumes:
+      - ./emr-s2-c1:/data/db
+    networks:
+      - "net"
+  mongo-client:
+    image: alfianlensundev/mongo-wkey:6.0.6-jammy
+    container_name: mongo-client
+    command: mongos --keyFile /data/mongodb-keyfile --configdb emr-config-rs/10.0.29.10:6001,10.0.29.11:6002,10.0.29.11:6003 --port 27017 --bind_ip_all 
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=xxx
+      - MONGO_INITDB_ROOT_PASSWORD=xxx
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    volumes:
+      - ./emr-client:/data/db
+    networks:
+      - "net"
+networks:
+  net:
+    external: true
